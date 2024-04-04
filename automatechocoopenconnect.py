@@ -77,8 +77,6 @@ def modify_nuspec_file(version):
     with open("openconnect.nuspec", "w", encoding='utf-8') as file:
         file.writelines(lines)
 
-# Usage
-modify_nuspec_file('9.12.0')
 
 
 job_id = find_windows(readfile("apikey.txt"))
