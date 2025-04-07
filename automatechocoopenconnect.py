@@ -3,38 +3,49 @@ from cloudmesh.common.util import readfile
 import requests
 from datetime import datetime
 
+
 def find_windows(token: str) -> str:
     base_url = "https://gitlab.com/api/v4/projects/openconnect%2Fopenconnect"
-    pipelines_url = f"{base_url}/pipelines?per_page=10&status=success"
     headers = {"PRIVATE-TOKEN": token}
+    page = 1
+    per_page = 100  # increase per_page count as needed
 
-    response = requests.get(pipelines_url, headers=headers)
+    while True:
+        pipelines_url = f"{base_url}/pipelines?per_page={per_page}&page={page}&status=success"
+        response = requests.get(pipelines_url, headers=headers)
+        if response.status_code != 200:
+            print(f"Pipeline request failed with status code {response.status_code}")
+            break
 
-    # Handle the response
-    if response.status_code == 200:
         pipelines = response.json()
+        if not pipelines:  # no more pipelines on this page
+            break
+
         for pipeline in pipelines:
             print(f"Pipeline ID: {pipeline['id']}")
             jobs_url = f"{base_url}/pipelines/{pipeline['id']}/jobs"
             jobs_response = requests.get(jobs_url, headers=headers)
-            if jobs_response.status_code == 200:
-                jobs = jobs_response.json()
-                for job in jobs:
-                    if job['name'] == 'MinGW64/GnuTLS':
-                        artifacts_url = f"{base_url}/jobs/{job['id']}/artifacts"
-                        artifacts_response = requests.get(artifacts_url, headers=headers)
-                        if artifacts_response.status_code == 200:
-                            print("FOUND!!!!!!")
-                            with open('wehaveawinner.zip', 'wb') as f:
-                                f.write(artifacts_response.content)
-                            print("Artifacts downloaded successfully.")
-                            return job['id']
-                        else:
-                            print(f"Request for artifacts failed with status code {artifacts_response.status_code}")
-            else:
+            if jobs_response.status_code != 200:
                 print(f"Request for jobs failed with status code {jobs_response.status_code}")
-    else:
-        print(f"Request failed with status code {response.status_code}")
+                continue
+
+            jobs = jobs_response.json()
+            for job in jobs:
+                print(f"Job Name: {job['name']}")
+                if job['name'] == 'MinGW64/GnuTLS':
+                    artifacts_url = f"{base_url}/jobs/{job['id']}/artifacts"
+                    artifacts_response = requests.get(artifacts_url, headers=headers)
+                    if artifacts_response.status_code == 200:
+                        print("FOUND!!!!!!")
+                        with open('wehaveawinner.zip', 'wb') as f:
+                            f.write(artifacts_response.content)
+                        print("Artifacts downloaded successfully.")
+                        return job['id']
+                    else:
+                        print(f"Request for artifacts failed with status code {artifacts_response.status_code}")
+        page += 1
+
+    return None
 
 
 def construct_url(job_id) -> str:

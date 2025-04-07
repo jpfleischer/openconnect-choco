@@ -1,6 +1,6 @@
 ﻿$ErrorActionPreference = 'Stop';
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$url        = 'https://gitlab.com/openconnect/openconnect/-/jobs/6273977608/artifacts/download?file_type=archive'
+$url        = 'https://gitlab.com/openconnect/openconnect/-/jobs/8818234827/artifacts/download?file_type=archive'
 
 $setupName = 'openconnect-installer-MinGW64-GnuTLS.exe'
 
@@ -9,7 +9,7 @@ $packageArgs = @{
     url           = $url
     UnzipLocation = $toolsDir
     fileType      = 'EXE'
-    Checksum      = '559C900B4DDC57424C0D4B92A4C62D59D09885D1FBB2B1E81F9298676FAEB7C5'
+    Checksum      = 'D85C0DE25B600428004C188A9C5AC44BFE106ED0D7203EE7CDB9DA064023FB55'
     ChecksumType  = 'sha256'
     softwareName  = 'openconnect*'
     silentArgs    = '/S'
