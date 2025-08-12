@@ -1,4 +1,4 @@
 *.nupkg
 *.zip
 cronchoco/credentials.yml
-
+apikey.txt
